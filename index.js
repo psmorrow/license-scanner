@@ -170,14 +170,19 @@ function printStatistics(licenses, depth) {
 				console.log(`${COLOR_BACKGROUND_RED}${l}${COLOR_RESET}: ${count}`);
 			}
 		});
-		console.log();
+		if (licenses.length === 0) {
+			console.log(`${COLOR_FOREGROUND_YELLOW}There are no dependencies.${COLOR_RESET}`);
+		}
 
 		// TODO: Evaluate each license and are there requirements that we need to fullfill?
 
-		if (statistics.totalNonSpdxLicenses === 0 && statistics.totalUnlicensed === 0 && statistics.totalNolicense) {
-			console.log(`${COLOR_FOREGROUND_GREEN}Congratulations! You are in compliance.${COLOR_RESET}`);
-		} else {
-			console.log(`${COLOR_FOREGROUND_YELLOW}Oops! You have work to do to get into compliance.${COLOR_RESET}`);
+		if (licenses.length > 0) {
+			console.log();
+			if (statistics.totalNonSpdxLicenses === 0 && statistics.totalUnlicensed === 0 && statistics.totalNolicense) {
+				console.log(`${COLOR_FOREGROUND_GREEN}Congratulations! You are in compliance.${COLOR_RESET}`);
+			} else {
+				console.log(`${COLOR_FOREGROUND_YELLOW}Oops! You have work to do to get into compliance.${COLOR_RESET}`);
+			}
 		}
 	}
 
