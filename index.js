@@ -106,6 +106,9 @@ function printLicenses(licenses, depth) {
 		}
 		printLicenses(l.dependencies, depth+1);
 	});
+	if (licenses.length === 0) {
+		console.log(`${COLOR_FOREGROUND_GREEN}There are no dependencies.${COLOR_RESET}`);
+	}
 }
 
 function printStatistics(licenses, depth) {
