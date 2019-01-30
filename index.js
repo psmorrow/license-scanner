@@ -183,7 +183,7 @@ function printStatistics(licenses, depth) {
 
 const scanner = {
 	scan: (directory) => {
-		directory = directory || `./${NODEMODULES_DIRECTORY}/`;
+		directory = directory || `../${NODEMODULES_DIRECTORY}/`;
 
 		console.log(`${COLOR_FOREGROUND_GREEN}License Scanner v1.0.0${COLOR_RESET}`);
 		console.log();
