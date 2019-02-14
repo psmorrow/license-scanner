@@ -1,6 +1,7 @@
 {
 	"name": "license-scanner",
 	"version": "1.0.0",
+	"bin": "./cli.js",
 	"author": {
 		"name": "Patrick Morrow"
 	},
