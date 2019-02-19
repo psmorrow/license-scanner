@@ -23,6 +23,7 @@ const HIERARCHY_PADDING = '    ';
 const NOLICENSE = 'NOLICENSE';
 const UNLICENSED = 'UNLICENSED';
 const CUSTOMLICENSE = 'SEE LICENSE IN';
+const LICENSE_SEPARATORS = [' AND ', ' OR ', ' WITH '];
 
 const COLOR_RESET = '\x1b[0m';
 //const COLOR_FOREGROUND_RED = '\x1b[31m';
@@ -99,12 +100,27 @@ function printLicenses(licenses, depth) {
 
 	let padding = HIERARCHY_PADDING.repeat(depth);
 	licenses.forEach((l) => {
-		// TODO: Support SPDX expressions - look for all the embedded licenses and the boolean logic in the expression.
-		const spdx = l.license.substring(1, l.license.length-1);
-		if (!l.license.startsWith(CUSTOMLICENSE) && spdxLicenses.includes(spdx)) {
+		if (l.license.startsWith(CUSTOMLICENSE)) {
 			console.log(`${padding}${l.name}@${l.version} ${l.license}`);
 		} else {
-			console.log(`${padding}${l.name}@${l.version} ${COLOR_BACKGROUND_RED}${l.license}${COLOR_RESET}`);
+			const spdxString = l.license.substring(1, l.license.length-1);
+			const spdxArray = spdxString.split(new RegExp(LICENSE_SEPARATORS.join('|'), 'g'));
+
+			let spdxValid = true;
+			for (let i = 0; i < spdxArray.length; ++i) {
+				const spdx = spdxArray[i];
+				if (!spdxLicenses.includes(spdx)) {
+					spdxValid = false;
+					break;
+				}
+			}
+
+			if (spdxValid) {
+				console.log(`${padding}${l.name}@${l.version} ${l.license}`);
+			} else {
+				console.log(`${padding}${l.name}@${l.version} ${COLOR_BACKGROUND_RED}${l.license}${COLOR_RESET}`);
+			}
+
 		}
 		printLicenses(l.dependencies, depth+1);
 	});
@@ -165,9 +181,19 @@ function printStatistics(licenses, depth) {
 		licenseKeys.forEach((l) => {
 			const count = statistics.licenses[l];
 
-			// TODO: Support SPDX expressions - look for all the embedded licenses and the boolean logic in the expression.
-			const spdx = l.substring(1, l.length-1);
-			if (spdxLicenses.includes(spdx)) {
+			const spdxString = l.substring(1, l.length-1);
+			const spdxArray = spdxString.split(new RegExp(LICENSE_SEPARATORS.join('|'), 'g'));
+
+			let spdxValid = true;
+			for (let i = 0; i < spdxArray.length; ++i) {
+				const spdx = spdxArray[i];
+				if (!spdxLicenses.includes(spdx)) {
+					spdxValid = false;
+					break;
+				}
+			}
+
+			if (spdxValid) {
 				console.log(`${l}: ${count}`);
 			} else {
 				console.log(`${COLOR_BACKGROUND_RED}${l}${COLOR_RESET}: ${count}`);
