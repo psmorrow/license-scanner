@@ -3,7 +3,7 @@
 /**
  * License Scanner
  *
- * Scan a NodeJS project's NPM dependencies for all the dependant license agreements.
+ * A license scanner that enumerates all NPM dependencies and displays their licenses and statistics.
  * What licenses do you have to be in compliance with? What are your obligations?
  *
  * Copyright (C) 2019 Patrick Morrow
