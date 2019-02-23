@@ -35,6 +35,25 @@ const COLOR_BACKGROUND_RED = '\x1b[41m';
 //const COLOR_BACKGROUND_YELLOW = '\x1b[43m';
 //const COLOR_BACKGROUND_BLUE = '\x1b[44m';
 
+function isSpdx(license) {
+	let spdx = true;
+
+	if (!license.startsWith(CUSTOMLICENSE)) {
+		license = (license[0] === '(' && license[license.length-1] === ')' ? license.substring(1, license.length-1) : license);
+
+		const elements = license.split(new RegExp(LICENSE_SEPARATORS.join('|'), 'g'));
+		for (let i = 0; i < elements.length; ++i) {
+			const element = elements[i];
+			if (!spdxLicenses.includes(element)) {
+				spdx = false;
+				break;
+			}
+		}
+	}
+
+	return spdx;
+}
+
 function getLicenses(directory) {
 	let licenses = [];
 	if (fs.existsSync(directory)) {
@@ -67,8 +86,7 @@ function getLicenses(directory) {
 						}
 					}
 
-					const isSpdx = (license[0] === '(' && license[license.length-1] === ')');
-					if (!isSpdx && !license.startsWith(CUSTOMLICENSE)) {
+					if (!license.startsWith(CUSTOMLICENSE) && !(license[0] === '(' && license[license.length-1] === ')')) {
 						license = `(${license})`;
 					}
 
@@ -76,8 +94,8 @@ function getLicenses(directory) {
 
 					licenses.push({
 						name,
-						license,
 						version,
+						license,
 						dependencies
 					});
 				} else if (f.name.startsWith('@')) {
@@ -91,6 +109,47 @@ function getLicenses(directory) {
 	return licenses;
 }
 
+function getLicensesAndStatistics(licenses, depth) {
+	depth = (depth === undefined ? 0 : depth);
+
+	let statistics = {
+		totalModules: 0,
+		totalNonSpdxLicenses: 0,
+		totalNolicense: 0,
+		totalUnlicensed: 0,
+		totalUnique: 0,
+		licenses: {}
+	};
+
+	licenses.forEach((l) => {
+		statistics.totalModules += 1;
+		statistics.totalNonSpdxLicenses += (isSpdx(l.license) ? 0 : 1);
+		statistics.totalNolicense += (l.license === `(${NOLICENSE})` ? 1 : 0);
+		statistics.totalUnlicensed += (l.license === UNLICENSED ? 1 : 0);
+		statistics.licenses[l.license] = (statistics.licenses[l.license] || 0) + 1;
+
+		const s = getLicensesAndStatistics(l.dependencies, depth+1);
+		statistics.totalModules += s.totalModules;
+		statistics.totalNonSpdxLicenses += s.totalNonSpdxLicenses;
+		statistics.totalNolicense += s.totalNolicense;
+		statistics.totalUnlicensed += s.totalUnlicensed;
+		for (let k in s.licenses) {
+			const count = s.licenses[k];
+			statistics.licenses[k] = (statistics.licenses[k] || 0) + count;
+		}
+	});
+
+	if (depth === 0) {
+		statistics.totalUnique = Object.keys(statistics.licenses).length;
+		return {
+			licenses,
+			statistics
+		}
+	}
+
+	return statistics;
+}
+
 function printLicenses(licenses, depth) {
 	depth = (depth === undefined ? 0 : depth);
 	if (depth === 0) {
@@ -100,27 +159,11 @@ function printLicenses(licenses, depth) {
 
 	let padding = HIERARCHY_PADDING.repeat(depth);
 	licenses.forEach((l) => {
-		if (l.license.startsWith(CUSTOMLICENSE)) {
+		const spdx = isSpdx(l.license);
+		if (spdx) {
 			console.log(`${padding}${l.name}@${l.version} ${l.license}`);
 		} else {
-			const spdxString = l.license.substring(1, l.license.length-1);
-			const spdxArray = spdxString.split(new RegExp(LICENSE_SEPARATORS.join('|'), 'g'));
-
-			let spdxValid = true;
-			for (let i = 0; i < spdxArray.length; ++i) {
-				const spdx = spdxArray[i];
-				if (!spdxLicenses.includes(spdx)) {
-					spdxValid = false;
-					break;
-				}
-			}
-
-			if (spdxValid) {
-				console.log(`${padding}${l.name}@${l.version} ${l.license}`);
-			} else {
-				console.log(`${padding}${l.name}@${l.version} ${COLOR_BACKGROUND_RED}${l.license}${COLOR_RESET}`);
-			}
-
+			console.log(`${padding}${l.name}@${l.version} ${COLOR_BACKGROUND_RED}${l.license}${COLOR_RESET}`);
 		}
 		printLicenses(l.dependencies, depth+1);
 	});
@@ -130,111 +173,67 @@ function printLicenses(licenses, depth) {
 	}
 }
 
-function printStatistics(licenses, depth) {
-	depth = (depth === undefined ? 0 : depth);
+function printStatistics(licenses) {
+	const data = getLicensesAndStatistics(licenses);
 
-	let statistics = {
-		totalModules: 0,
-		totalNonSpdxLicenses: 0,
-		totalUnlicensed: 0,
-		totalNolicense: 0,
-		licenses: []
-	};
+	console.log(`${COLOR_FOREGROUND_GREEN}### STATISTICS ###${COLOR_RESET}`);
+	console.log();
+	console.log(`Total modules: ${data.statistics.totalModules}`);
+	console.log(`Non-SPDX licenses: ${data.statistics.totalNonSpdxLicenses}`);
+	console.log(`Nolicense: ${data.statistics.totalNolicense}`);
+	console.log(`Unlicensed (Private): ${data.statistics.totalUnlicensed}`);
+	console.log(`Unique licenses: ${data.statistics.totalUnique}`);
+	console.log();
 
-	licenses.forEach((l) => {
-		statistics.totalModules += 1;
-
-		// TODO: Support SPDX expressions - look for all the embedded licenses and the boolean logic in the expression.
-		const spdx = l.license.substring(1, l.license.length-1);
-		if (!spdxLicenses.includes(spdx)) {
-			statistics.totalNonSpdxLicenses += 1;
-		}
-
-		statistics.totalUnlicensed += (l.license === UNLICENSED ? 1 : 0);
-		statistics.totalNolicense += (l.license === `(${NOLICENSE})` ? 1 : 0);
-		statistics.licenses[l.license] = (statistics.licenses[l.license] || 0) + 1;
-
-		const s = printStatistics(l.dependencies, depth+1);
-		statistics.totalModules += s.totalModules;
-		statistics.totalNonSpdxLicenses += s.totalNonSpdxLicenses;
-		statistics.totalUnlicensed += s.totalUnlicensed;
-		statistics.totalNolicense += s.totalNolicense;
-		for (let k in s.licenses) {
-			const count = s.licenses[k];
-			statistics.licenses[k] = (statistics.licenses[k] || 0) + count;
+	const licenseKeys = Object.keys(data.statistics.licenses);
+	licenseKeys.forEach((l) => {
+		const count = data.statistics.licenses[l];
+		const spdx = isSpdx(l);
+		if (spdx) {
+			console.log(`${l}: ${count}`);
+		} else {
+			console.log(`${COLOR_BACKGROUND_RED}${l}${COLOR_RESET}: ${count}`);
 		}
 	});
 
-	if (depth === 0) {
-		const licenseKeys = Object.keys(statistics.licenses);
-		licenseKeys.sort();
+	// TODO: Evaluate each license and are there requirements that we need to fullfill?
 
-		console.log(`${COLOR_FOREGROUND_GREEN}### STATISTICS ###${COLOR_RESET}`);
+	if (licenses.length > 0) {
 		console.log();
-		console.log(`Dependant modules: ${statistics.totalModules}`);
-		console.log(`Non-SPDX licenses: ${statistics.totalNonSpdxLicenses}`);
-		console.log(`Different licenses: ${licenseKeys.length}`);
-		console.log(`Unlicensed (Private): ${statistics.totalUnlicensed}`);
-		console.log(`Nolicense: ${statistics.totalNolicense}`);
-		console.log();
-
-		licenseKeys.forEach((l) => {
-			const count = statistics.licenses[l];
-
-			const spdxString = l.substring(1, l.length-1);
-			const spdxArray = spdxString.split(new RegExp(LICENSE_SEPARATORS.join('|'), 'g'));
-
-			let spdxValid = true;
-			for (let i = 0; i < spdxArray.length; ++i) {
-				const spdx = spdxArray[i];
-				if (!spdxLicenses.includes(spdx)) {
-					spdxValid = false;
-					break;
-				}
-			}
-
-			if (spdxValid) {
-				console.log(`${l}: ${count}`);
-			} else {
-				console.log(`${COLOR_BACKGROUND_RED}${l}${COLOR_RESET}: ${count}`);
-			}
-		});
-
-		// TODO: Evaluate each license and are there requirements that we need to fullfill?
-
-		if (licenses.length > 0) {
-			console.log();
-			if (statistics.totalNonSpdxLicenses === 0 && statistics.totalUnlicensed === 0 && statistics.totalNolicense) {
-				console.log(`${COLOR_FOREGROUND_GREEN}Congratulations! You are in compliance.${COLOR_RESET}`);
-			} else {
-				console.log(`${COLOR_FOREGROUND_YELLOW}Oops! You are NOT in compliance. Review your dependencies and their licenses.${COLOR_RESET}`);
-			}
+		if (data.statistics.totalNonSpdxLicenses === 0 && data.statistics.totalUnlicensed === 0 && data.statistics.totalNolicense) {
+			console.log(`${COLOR_FOREGROUND_GREEN}Congratulations! You are in compliance.${COLOR_RESET}`);
 		} else {
-			console.log(`${COLOR_FOREGROUND_YELLOW}There are no dependencies.${COLOR_RESET}`);
+			console.log(`${COLOR_FOREGROUND_YELLOW}Oops! You are NOT in compliance. Review your dependencies and their licenses.${COLOR_RESET}`);
 		}
+	} else {
+		console.log(`${COLOR_FOREGROUND_YELLOW}There are no dependencies.${COLOR_RESET}`);
 	}
-
-	return statistics;
 }
 
 const scanner = {
-	scan: (directory) => {
+	scan: (directory, format) => {
 		directory = directory || `./${NODEMODULES_DIRECTORY}`;
+		format = format || 'print'; // print || json
 
-		console.log(`${COLOR_FOREGROUND_GREEN}License Scanner v1.0.0${COLOR_RESET}`);
-		console.log();
-		console.log(`${COLOR_FOREGROUND_BLUE}Scan a NodeJS project's NPM dependencies for all the dependant license agreements.${COLOR_RESET}`);
-		console.log(`${COLOR_FOREGROUND_BLUE}What licenses do you have to be in compliance with? What are your obligations?${COLOR_RESET}`);
-		console.log();
-		console.log(`${COLOR_FOREGROUND_BLUE}Copyright (C) 2019 Patrick Morrow${COLOR_RESET}`);
-		console.log(`${COLOR_FOREGROUND_BLUE}MIT Licensed${COLOR_RESET}`);
-		console.log();
+		if (format === 'json') {
+			const licenses = getLicenses(directory);
+			return getLicensesAndStatistics(licenses);
+		} else if (format === 'print') {
+			console.log(`${COLOR_FOREGROUND_GREEN}License Scanner v1.0.0${COLOR_RESET}`);
+			console.log();
+			console.log(`${COLOR_FOREGROUND_BLUE}Scan a NodeJS project's NPM dependencies for all the dependant license agreements.${COLOR_RESET}`);
+			console.log(`${COLOR_FOREGROUND_BLUE}What licenses do you have to be in compliance with? What are your obligations?${COLOR_RESET}`);
+			console.log();
+			console.log(`${COLOR_FOREGROUND_BLUE}Copyright (C) 2019 Patrick Morrow${COLOR_RESET}`);
+			console.log(`${COLOR_FOREGROUND_BLUE}MIT Licensed${COLOR_RESET}`);
+			console.log();
 
-		const licenses = getLicenses(directory);
-		printLicenses(licenses);
-		console.log();
-		printStatistics(licenses);
-		console.log();
+			const licenses = getLicenses(directory);
+			printLicenses(licenses);
+			console.log();
+			printStatistics(licenses);
+			console.log();
+		}
 	}
 };
 
