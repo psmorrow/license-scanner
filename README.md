@@ -1,9 +1,19 @@
 # License Scanner
 A license scanner that enumerates all NPM dependencies and displays their licenses and statistics.
 
-To use via the CLI: `license-scanner`
+[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=psmorrow_license-scanner&metric=alert_status)](https://sonarcloud.io/dashboard?id=psmorrow_license-scanner)
 
-To use within code: `require("license-scanner").scan()`
+## Usage
+
+To use at the command line:
+```bash
+license-scanner
+```
+
+To use within code:
+```
+require("license-scanner").scan()
+```
 
 ### Optional Parameters
 
@@ -12,6 +22,5 @@ To use within code: `require("license-scanner").scan()`
 | `directory` | String  | The relative path to scan.                             | ./node_modules |
 | `format`    | String  | The format for the scan results, either print or json. | print          |
 
-<br>
-
-[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=psmorrow_license-scanner&metric=alert_status)](https://sonarcloud.io/dashboard?id=psmorrow_license-scanner)
+## License
+MIT
