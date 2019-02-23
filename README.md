@@ -17,14 +17,14 @@ npm install -g https://github.com/psmorrow/license-scanner.git
 
 ## Usage
 
-To use at the command line:
-```bash
-license-scanner [directory] [format]
-```
-
 To use within code:
 ```
 require("license-scanner").scan([directory], [format])
+```
+
+To use at the command line:
+```bash
+license-scanner [directory] [format]
 ```
 
 ### Optional Parameters
