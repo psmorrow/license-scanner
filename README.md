@@ -7,12 +7,12 @@ A license scanner that enumerates all NPM dependencies and displays their licens
 
 To use at the command line:
 ```bash
-license-scanner
+license-scanner [directory] [format]
 ```
 
 To use within code:
 ```
-require("license-scanner").scan()
+require("license-scanner").scan([directory], [format])
 ```
 
 ### Optional Parameters
