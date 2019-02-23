@@ -1,5 +1,5 @@
 # License Scanner
-A license scanner that enumerates all a NodeJS project's NPM dependencies and displays their licenses and some cumulative statistics.
+A license scanner that enumerates all NPM dependencies and displays their licenses and statistics.
 
 To use via the CLI: `license-scanner`
 
