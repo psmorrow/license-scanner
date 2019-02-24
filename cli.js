@@ -7,9 +7,13 @@ if (process.argv.length > 2) {
 	directory = process.argv[2];
 }
 
-let format;
+let format; // print || json
 if (process.argv.length > 3) {
 	format = process.argv[3];
 }
 
-console.log(require("./index.js").scan(directory, format));
+const data = require("./index.js").scan(directory, format);
+
+if (format === "json") {
+	console.log(data);
+}
