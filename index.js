@@ -68,7 +68,7 @@ function isOsiApproved(license) {
 		const elements = license.split(new RegExp(LICENSE_SEPARATORS.join('|'), 'g'));
 		for (let i = 0; i < elements.length; ++i) {
 			const element = elements[i];
-			if (!spdxOsiApproved[element] || !spdxOsiApproved[element]) {
+			if (!spdxOsiApproved[element]) {
 				osiApproved = false;
 				break;
 			}
