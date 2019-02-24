@@ -141,7 +141,8 @@ function getLicensesAndStatistics(licenses, depth) {
 		totalNonSpdxLicenses: 0,
 		totalNolicense: 0,
 		totalUnlicensed: 0,
-		totalUnique: 0,
+		totalNonCompliantLicenses: 0,
+		totalUniqueLicenses: 0,
 		uniques: {}
 	};
 
@@ -164,7 +165,22 @@ function getLicensesAndStatistics(licenses, depth) {
 	});
 
 	if (depth === 0) {
-		statistics.totalUnique = Object.keys(statistics.uniques).length;
+		const uniquesKeys = Object.keys(statistics.uniques);
+
+		uniquesKeys.forEach((license) => {
+			const spdx = isSpdx(license);
+			if (spdx) {
+				const osiApproved = isOsiApproved(license);
+				 if (!osiApproved) {
+					statistics.totalNonCompliantLicenses += 1;
+				}
+			} else {
+				statistics.totalNonCompliantLicenses += 1;
+			}
+		});
+
+		statistics.totalUniqueLicenses = uniquesKeys.length;
+
 		return {
 			licenses,
 			statistics
@@ -204,22 +220,21 @@ function printLicenses(licenses, depth) {
 
 function printStatistics(licenses) {
 	const data = getLicensesAndStatistics(licenses);
+	const statistics = data.statistics;
 
 	console.log(`${COLOR_FOREGROUND_GREEN}### STATISTICS ###${COLOR_RESET}`);
 	console.log();
-	console.log(`Total modules: ${data.statistics.totalModules}`);
-	console.log(`Non-SPDX licenses: ${data.statistics.totalNonSpdxLicenses}`);
-	console.log(`Nolicense: ${data.statistics.totalNolicense}`);
-	console.log(`Unlicensed (Private): ${data.statistics.totalUnlicensed}`);
-	console.log(`Unique licenses: ${data.statistics.totalUnique}`);
+	console.log(`Total modules: ${statistics.totalModules}`);
+	console.log(`Non-SPDX licenses: ${statistics.totalNonSpdxLicenses}`);
+	console.log(`Nolicense: ${statistics.totalNolicense}`);
+	console.log(`Unlicensed (Private): ${statistics.totalUnlicensed}`);
+	console.log(`Unique licenses: ${statistics.totalUniqueLicenses}`);
 	console.log();
 
-	let totalNonCompliance = 0;
-
-	const keys = Object.keys(data.statistics.uniques);
-	keys.sort();
-	keys.forEach((license) => {
-		const count = data.statistics.uniques[license];
+	const uniquesKeys = Object.keys(statistics.uniques);
+	uniquesKeys.sort();
+	uniquesKeys.forEach((license) => {
+		const count = statistics.uniques[license];
 		const spdx = isSpdx(license);
 		if (spdx) {
 			const osiApproved = isOsiApproved(license);
@@ -227,26 +242,24 @@ function printStatistics(licenses) {
 				console.log(`${license}: ${count}`);
 			} else {
 				console.log(`${COLOR_FOREGROUND_RED}${license}${COLOR_RESET}: ${count}`);
-				totalNonCompliance += 1;
 			}
 		} else {
 			console.log(`${COLOR_FOREGROUND_YELLOW}${license}${COLOR_RESET}: ${count}`);
-			totalNonCompliance += 1;
 		}
 	});
 
 	if (licenses.length > 0) {
 		console.log();
-		if (totalNonCompliance === 0) {
+		if (data.statistics.totalNonCompliantLicenses === 0) {
 			console.log(`${COLOR_FOREGROUND_GREEN}Congratulations! You are in compliance.${COLOR_RESET}`);
 		} else {
-			console.log(`${COLOR_FOREGROUND_YELLOW}There are ${totalNonCompliance} compliance errors. Review the highlighted licenses.${COLOR_RESET}`);
+			console.log(`${COLOR_FOREGROUND_YELLOW}There are ${data.statistics.totalNonCompliantLicenses} non-compliant licenses. Review the highlighted licenses.${COLOR_RESET}`);
 		}
 	} else {
 		console.log(`${COLOR_FOREGROUND_GREEN}There are no dependencies.${COLOR_RESET}`);
 	}
 
-	return totalNonCompliance;
+	return data;
 }
 
 const scanner = {
@@ -254,9 +267,10 @@ const scanner = {
 		directory = directory || `./${NODEMODULES_DIRECTORY}`;
 		format = format || 'print'; // print || json
 
+		var data = {};
 		if (format === 'json') {
 			const licenses = getLicenses(directory);
-			return getLicensesAndStatistics(licenses);
+			data = getLicensesAndStatistics(licenses);
 		} else if (format === 'print') {
 			const packageVersion = require(`./${PACKAGE_FILENAME}`).version;
 			console.log(`${COLOR_FOREGROUND_GREEN}License Scanner v${packageVersion}${COLOR_RESET}`);
@@ -271,10 +285,10 @@ const scanner = {
 			const licenses = getLicenses(directory);
 			printLicenses(licenses);
 			console.log();
-			const totalNonCompliance = printStatistics(licenses);
+			data = printStatistics(licenses);
 			console.log();
-			return totalNonCompliance;
 		}
+		return data;
 	}
 };
 
