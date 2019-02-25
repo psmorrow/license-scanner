@@ -1,7 +1,6 @@
 {
 	"name": "license-scanner",
 	"version": "1.0.0",
-	"bin": "./cli.js",
 	"author": {
 		"name": "Patrick Morrow"
 	},
@@ -10,7 +9,16 @@
 		"type": "git",
 		"url": "https://github.com/psmorrow/license-scanner.git"
 	},
+	"bin": "./cli.js",
+	"scripts": {
+		"test": "./node_modules/mocha/bin/mocha tests/**"
+	},
 	"dependencies": {
 		"spdx-license-list": "5.0.0"
+	},
+	"devDependencies": {
+		"chai": "4.2.0",
+		"chai-spies": "1.0.0",
+		"mocha": "6.0.1"
 	}
 }

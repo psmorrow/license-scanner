@@ -1,19 +1,23 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-let directory;
-if (process.argv.length > 2) {
-	directory = process.argv[2];
-}
+const cli = {
+	scan: (directory, format) => {
+		return require('./index.js').scan(directory, format);
+	}
+};
 
-let format; // print || json
-if (process.argv.length > 3) {
-	format = process.argv[3];
-}
+if (require.main === module) {
+	const args = process.argv.slice(2);
 
-const data = require("./index.js").scan(directory, format);
+	const directory = (args.length >= 1 ? args[0] : undefined);
+	const format = (args.length >= 2 ? args[1] : undefined);
 
-if (format === "json") {
-	console.log(data);
+	const data = cli.scan(directory, format);
+	if (format === 'json') {
+		return console.log(data);
+	}
+} else {
+	module.exports = cli;
 }
