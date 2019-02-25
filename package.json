@@ -11,7 +11,20 @@
 	},
 	"bin": "./cli.js",
 	"scripts": {
-		"test": "./node_modules/mocha/bin/mocha tests/**"
+		"test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha tests/**/*.js"
+	},
+	"nyc": {
+		"all": true,
+		"exclude": [
+			".nyc_output/**",
+			"coverage/**",
+			"node_modules/**",
+			"tests/**"
+		],
+		"reporter": [
+			"lcov",
+			"text"
+		]
 	},
 	"dependencies": {
 		"spdx-license-list": "5.0.0"
@@ -19,6 +32,7 @@
 	"devDependencies": {
 		"chai": "4.2.0",
 		"chai-spies": "1.0.0",
-		"mocha": "6.0.1"
+		"mocha": "6.0.1",
+		"nyc": "13.3.0"
 	}
 }
