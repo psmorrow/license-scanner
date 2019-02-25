@@ -72,7 +72,7 @@ describe('cli', () => {
 
 		it('should print results without arguments', () => {
 			var cliFullPath = path.resolve(`${__dirname}/../cli.js`);
-			exec(`node ${cliFullPath}`, (err, stdout, stderr) => {
+			exec(`node "${cliFullPath}"`, (err, stdout, stderr) => {
 				expect(err).to.be.null;
 				expect(stdout).to.include('\x1b[32m### LICENSES ###\x1b[0m');
 				expect(stdout).to.include('\x1b[32m### STATISTICS ###\x1b[0m');
@@ -81,7 +81,7 @@ describe('cli', () => {
 
 		it('should print results with directory and format arguments', () => {
 			var cliFullPath = path.resolve(`${__dirname}/../cli.js`);
-			exec(`node ${cliFullPath} ./node_modules print`, (err, stdout, stderr) => {
+			exec(`node "${cliFullPath}" ./node_modules print`, (err, stdout, stderr) => {
 				expect(err).to.be.null;
 				expect(stdout).to.include('\x1b[32m### LICENSES ###\x1b[0m');
 				expect(stdout).to.include('\x1b[32m### STATISTICS ###\x1b[0m');
@@ -90,7 +90,7 @@ describe('cli', () => {
 
 		it('should return json results with directory and format arguments', () => {
 			var cliFullPath = path.resolve(`${__dirname}/../cli.js`);
-			exec(`node ${cliFullPath} ./node_modules json`, (err, stdout, stderr) => {
+			exec(`node "${cliFullPath}" ./node_modules json`, (err, stdout, stderr) => {
 				expect(err).to.be.null;
 				expect(stdout).to.include('licenses');
 				expect(stdout).to.include('statistics');
