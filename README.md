@@ -35,4 +35,4 @@ license-scanner [directory] [format]
 | `format`    | String  | The format for the scan results, either `print` or `json`. | `print`          |
 
 ## License
-MIT
+[MIT](LICENSE)
