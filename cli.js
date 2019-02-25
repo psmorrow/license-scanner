@@ -2,6 +2,16 @@
 
 'use strict';
 
+/**
+ * License Scanner CLI
+ *
+ * A license scanner that enumerates all NPM dependencies and displays their licenses and statistics.
+ * What licenses do you have to be in compliance with? What are your obligations?
+ *
+ * Copyright (C) 2019 Patrick Morrow
+ * MIT Licensed
+ */
+
 const cli = {
 	scan: (directory, format) => {
 		return require('./index.js').scan(directory, format);

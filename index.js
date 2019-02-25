@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * License Scanner
+ * License Scanner Module
  *
  * A license scanner that enumerates all NPM dependencies and displays their licenses and statistics.
  * What licenses do you have to be in compliance with? What are your obligations?
