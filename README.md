@@ -5,24 +5,24 @@ A license scanner that enumerates all NPM dependencies and displays their licens
 
 ## Installation
 
-To install local within the current project:
+To install locally within the current project:
 ```
 npm install https://github.com/psmorrow/license-scanner.git
 ```
 
-To install global within the operating system:
+To install globally within the operating system:
 ```
 npm install -g https://github.com/psmorrow/license-scanner.git
 ```
 
 ## Usage
 
-To use within code:
+To run locally within the current project (code):
 ```
 require("license-scanner").scan([directory], [format])
 ```
 
-To use at the command line:
+To run globally within the operating system (command line):
 ```bash
 license-scanner [directory] [format]
 ```
