@@ -1,6 +1,8 @@
 # License Scanner
 A license scanner that enumerates all NPM dependencies and displays their licenses and statistics.
 
+[![Build Status](https://travis-ci.com/psmorrow/license-scanner.svg?branch=master)](https://travis-ci.com/psmorrow/license-scanner)
+
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=psmorrow_license-scanner&metric=alert_status)](https://sonarcloud.io/dashboard?id=psmorrow_license-scanner)
 
 ## Installation
