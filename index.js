@@ -186,7 +186,7 @@ const utilities = {
 			return {
 				licenses,
 				statistics
-			}
+			};
 		}
 
 		return statistics;

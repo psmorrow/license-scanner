@@ -26,7 +26,7 @@ if (require.main === module) {
 
 	const data = cli.scan(directory, format);
 	if (format === 'json') {
-		return console.log(data);
+		console.log(data);
 	}
 } else {
 	module.exports = cli;

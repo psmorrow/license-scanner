@@ -76,6 +76,7 @@ describe('cli', () => {
 				expect(err).to.be.null;
 				expect(stdout).to.include('\x1b[32m### LICENSES ###\x1b[0m');
 				expect(stdout).to.include('\x1b[32m### STATISTICS ###\x1b[0m');
+				expect(stderr).to.be.empty;
 			});
 		});
 
@@ -85,6 +86,7 @@ describe('cli', () => {
 				expect(err).to.be.null;
 				expect(stdout).to.include('\x1b[32m### LICENSES ###\x1b[0m');
 				expect(stdout).to.include('\x1b[32m### STATISTICS ###\x1b[0m');
+				expect(stderr).to.be.empty;
 			});
 		});
 
@@ -94,6 +96,7 @@ describe('cli', () => {
 				expect(err).to.be.null;
 				expect(stdout).to.include('licenses');
 				expect(stdout).to.include('statistics');
+				expect(stderr).to.be.empty;
 			});
 		});
 	});
