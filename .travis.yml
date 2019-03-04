@@ -1,13 +1,16 @@
 dist: trusty
 language: node_js
 node_js:
-  - "lts/*"
+  - lts/*
 addons:
   sonarcloud:
-    organization: "psmorrow-github"
+    organization: psmorrow-github
     token:
-      secure: "TxAA0uVdI2eYISfUbLqMg35qCsl4XYDlRRpla9tloH3Wg9edf8rhOxWo7b2/jgOAAFp2PCK9SMt5A73PuGAsovV4EXa2EyP7o/dm7B++pcmy9/jSqHXpS3uRk1jLg6KTxAjfI6uRYaKCIes/eCc1A1dxEmq9Imy86ijzQnPwZDlL1sB3EH9L6wVAANTx7AC1KyGjlvy8fnN419Ptix9jFRv7lk4okSG5LEU/oGoeDLkzCSro9NmxtPpGfdzhVGFUq5umTiIcoauSDpVeqRMAhJjmeWzGrN/HPzpm1XXhM5H6+/jm77T9G+WRo69dkzKWYagBuPuaPgC1N0fcVmUIPO8Kc4DG3yK1bxmahMIVK1AhuFwOlZ2WrLQdXDbt70HfZDr9AKUMVKyfce9Yy+Jm6+Drfu3CYeBawO1WmDqUUxdCueBph5jP4Yaz/PQcDrvr/4rweR7uGRg8tLFDVnCSQBLJ3ctu7XHWURg+EOEXZyEH9WeCBJPxeT8GKY7SvnuPPZ16FBhXPvLhL9pYcH5OqdjIBYLD8yhZqFpBSZyMaWvvdKkQWO3m71G6Zt8EqDpTlsbbtv8mjqjTVD099wmt/9BiOq/oxtd2nfZZsq7ZWkbiytklI0lYQC36y9F3bVBzVPnzdJ76e351kCrGDBb467dcMTOXqDoNDbga3LLt5dI="
+      secure: TxAA0uVdI2eYISfUbLqMg35qCsl4XYDlRRpla9tloH3Wg9edf8rhOxWo7b2/jgOAAFp2PCK9SMt5A73PuGAsovV4EXa2EyP7o/dm7B++pcmy9/jSqHXpS3uRk1jLg6KTxAjfI6uRYaKCIes/eCc1A1dxEmq9Imy86ijzQnPwZDlL1sB3EH9L6wVAANTx7AC1KyGjlvy8fnN419Ptix9jFRv7lk4okSG5LEU/oGoeDLkzCSro9NmxtPpGfdzhVGFUq5umTiIcoauSDpVeqRMAhJjmeWzGrN/HPzpm1XXhM5H6+/jm77T9G+WRo69dkzKWYagBuPuaPgC1N0fcVmUIPO8Kc4DG3yK1bxmahMIVK1AhuFwOlZ2WrLQdXDbt70HfZDr9AKUMVKyfce9Yy+Jm6+Drfu3CYeBawO1WmDqUUxdCueBph5jP4Yaz/PQcDrvr/4rweR7uGRg8tLFDVnCSQBLJ3ctu7XHWURg+EOEXZyEH9WeCBJPxeT8GKY7SvnuPPZ16FBhXPvLhL9pYcH5OqdjIBYLD8yhZqFpBSZyMaWvvdKkQWO3m71G6Zt8EqDpTlsbbtv8mjqjTVD099wmt/9BiOq/oxtd2nfZZsq7ZWkbiytklI0lYQC36y9F3bVBzVPnzdJ76e351kCrGDBb467dcMTOXqDoNDbga3LLt5dI=
+before_install:
+  - sed -i -e "s/1.0.0/1.0.$TRAVIS_BUILD_NUMBER/" package.json
+  - sed -i -e "s/1.0.0/1.0.$TRAVIS_BUILD_NUMBER/" sonar-project.properties
 script:
-  - "npm run lint"
-  - "npm test"
+  - npm run lint
+  - npm test
   - sonar-scanner
