@@ -17,12 +17,12 @@ npm install -g https://github.com/psmorrow/license-scanner.git
 
 ## Usage
 
-To run locally within the current project (code):
+To use locally within the current project (call from code):
 ```
 require("license-scanner").scan([directory], [format])
 ```
 
-To run globally within the operating system (command line):
+To use globally within the operating system (execute via command line):
 ```bash
 license-scanner [directory] [format]
 ```
