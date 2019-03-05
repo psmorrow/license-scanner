@@ -29,10 +29,10 @@ license-scanner [directory] [format]
 
 ### Optional Parameters
 
-| Name        | Type    | Description                                                | Default          |
-| ----------- | ------- | ---------------------------------------------------------- | ---------------- |
-| `directory` | String  | The relative path to scan.                                 | `./node_modules` |
-| `format`    | String  | The format for the scan results, either `print` or `json`. | `print`          |
+| Name        | Type    | Description                                        | Default          |
+| ----------- | ------- | -------------------------------------------------- | ---------------- |
+| `directory` | String  | The relative path to scan.                         | `./node_modules` |
+| `format`    | String  | The scan results format, either `print` or `json`. | `print`          |
 
 ## License
 [MIT](LICENSE)
