@@ -1,4 +1,6 @@
 .nyc_output
+.vscode
+cov-int
 coverage
 node_modules
 package-lock.json

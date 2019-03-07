@@ -1,16 +1,33 @@
+env:
+  global:
+  - secure: iiFBTXSUN+J/rPkpjpJDd4sbrLFD6oQvyM783aZnretLHoMpuoOgg7CJ1XgoYvylNu5ZpNfdSpmvRf9gZIs6sX9sW0FXjvVhWlmPEA/H0WaE7JRy12LynF6U2zttk/3CG2O0mIapaoZ3hkGqwbI/leAw+2MXSqzJpwaWJiDhp2gpYqkwACunv073BMcBPIJuJf5ZC9dA+SuyVsZYF9D+neoIOSpjGBy5do2hGuj8tWrPf2nWwiF52nq5bz981BcQTZVnI8IPmsdHDOlYuTGC7ix82Y7V2sKhLLf2yWWcqViriwNf9xenFYSQABmq5JFa9XIBL2pJXUa24qQqwk/wgnp7ZTns0OwlpkkFMPy3ilifrh4q8XxG6y6OOVjkr9Ffp5IB4tKz7w/Yfl+IPVZxxzOb0MURQvuABWFojm+DhV5hcMNAG/Od/Whi7jTvR/jk3cplbfpes1MIqyf84ObMIWIXK3MnWElrZpWYR4vBAZt5btvIbTf1vtW0UUNoPPf3fQWMB4g2+oymlVGNKxUSer1XnnWY9M6oOdhPJKFYgkWZuqb0YjSkyGMf3pgXOw0fMB+v1p+VNuwr4pRBJUfmOSRV0YRzcAWMwggj1nhCvGXNjVCY9SuIt1xiFokZnMnhrMmk3OsrxJnZHUhYpNBpuTHVz2/ZUsEI5sjtv4Kqg5o=
+
 dist: trusty
+
 language: node_js
 node_js:
-  - lts/*
+- lts/*
+
 addons:
   sonarcloud:
     organization: psmorrow-github
     token:
       secure: TxAA0uVdI2eYISfUbLqMg35qCsl4XYDlRRpla9tloH3Wg9edf8rhOxWo7b2/jgOAAFp2PCK9SMt5A73PuGAsovV4EXa2EyP7o/dm7B++pcmy9/jSqHXpS3uRk1jLg6KTxAjfI6uRYaKCIes/eCc1A1dxEmq9Imy86ijzQnPwZDlL1sB3EH9L6wVAANTx7AC1KyGjlvy8fnN419Ptix9jFRv7lk4okSG5LEU/oGoeDLkzCSro9NmxtPpGfdzhVGFUq5umTiIcoauSDpVeqRMAhJjmeWzGrN/HPzpm1XXhM5H6+/jm77T9G+WRo69dkzKWYagBuPuaPgC1N0fcVmUIPO8Kc4DG3yK1bxmahMIVK1AhuFwOlZ2WrLQdXDbt70HfZDr9AKUMVKyfce9Yy+Jm6+Drfu3CYeBawO1WmDqUUxdCueBph5jP4Yaz/PQcDrvr/4rweR7uGRg8tLFDVnCSQBLJ3ctu7XHWURg+EOEXZyEH9WeCBJPxeT8GKY7SvnuPPZ16FBhXPvLhL9pYcH5OqdjIBYLD8yhZqFpBSZyMaWvvdKkQWO3m71G6Zt8EqDpTlsbbtv8mjqjTVD099wmt/9BiOq/oxtd2nfZZsq7ZWkbiytklI0lYQC36y9F3bVBzVPnzdJ76e351kCrGDBb467dcMTOXqDoNDbga3LLt5dI=
+  coverity_scan:
+    project:
+      name: "psmorrow/license-scanner"
+      description: "License Scanner"
+    notification_email: pat@themorrowgroup.com
+    build_command_prepend: ""
+    build_command: "--no-command --fs-capture-search ./ --fs-capture-search-exclude-regex coverage --fs-capture-search-exclude-regex node_modules"
+    branch_pattern: master
+
 before_install:
-  - npm version 1.0.$TRAVIS_BUILD_NUMBER
-  - sed -i -e "s/sonar.projectVersion=1.0.0/sonar.projectVersion=1.0.$TRAVIS_BUILD_NUMBER/g" sonar-project.properties
+- npm version 1.0.$TRAVIS_BUILD_NUMBER
+- sed -i -e "s/sonar.projectVersion=1.0.0/sonar.projectVersion=1.0.$TRAVIS_BUILD_NUMBER/g" sonar-project.properties
+- echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
 script:
-  - npm run lint
-  - npm test
-  - sonar-scanner
+- npm run lint
+- npm test
+- sonar-scanner
