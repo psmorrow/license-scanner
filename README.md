@@ -17,22 +17,22 @@ npm install -g https://github.com/psmorrow/license-scanner.git
 
 ## Usage
 
-To run locally within the current project (code):
+To use locally within the current project (call from code):
 ```
 require("license-scanner").scan([directory], [format])
 ```
 
-To run globally within the operating system (command line):
+To use globally within the operating system (execute via command line):
 ```bash
 license-scanner [directory] [format]
 ```
 
 ### Optional Parameters
 
-| Name        | Type    | Description                                                | Default          |
-| ----------- | ------- | ---------------------------------------------------------- | ---------------- |
-| `directory` | String  | The relative path to scan.                                 | `./node_modules` |
-| `format`    | String  | The format for the scan results, either `print` or `json`. | `print`          |
+| Name        | Type    | Description                                        | Default          |
+| ----------- | ------- | -------------------------------------------------- | ---------------- |
+| `directory` | String  | The relative path to scan.                         | `./node_modules` |
+| `format`    | String  | The scan results format, either `print` or `json`. | `print`          |
 
 ## License
 [MIT](LICENSE)
